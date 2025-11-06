@@ -1,19 +1,29 @@
-// @des by default, the error middleware from express is html page
-// @desc But we want to send json error response instead 
+// by default, the error middleware from express is html page. But we want to send json error response instead
+
+/**
+ * @desc not found middleware
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */ 
 const notFound = (req, res, next) => {
-  console.log(222)
   const error = new Error(`Not Found - ${req.originalUrl}`)
   res.status(404)
   next(error)
 } 
 
-// @desc custom error middleware
+/**
+ * @desc custom error middleware
+ * @param {*} err 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 const errorHandler = (err, req, res, next) => {
-  console.log(333)
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode
   let message = err.message
 
-// mongoose error
+// this is the mongoose error
   if (err.name === 'CastError' && err.kind === 'ObjectId') {
     message = 'Resource not found'
     statusCode = 404
