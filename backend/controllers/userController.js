@@ -8,11 +8,25 @@ import generateToken from '../utils/generateToken.js'
  * @access Public
  */
 const authUser = asyncHandler(async (req, res) => {
-  res.status(401)
-  throw new Error('Not authorized, please login') // asyncHandler + throw error === try catch next(error)
-  // res.status(200).json({
-  //   message: 'auth user...'
-  // })
+  const {email, password} = req?.body || {}
+  const user = await User.findOne({email})
+  // check if user and password match
+  if(!user) {
+    res.status(401)
+    throw new Error('Invalid email or password')
+  }else {
+   const isMatch = await user.matchPassword(password) // compare the password with the hashed password in the database
+    if(!isMatch) {
+      res.status(401)
+      throw new Error('Incorrect password')
+    }
+    generateToken(res, user._id)
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email
+    })
+  }
 })
 
 /**
@@ -52,6 +66,10 @@ const registerUser = asyncHandler(async (req, res) => {
  */
 
 const logoutUser = asyncHandler(async (req, res) => {
+  res.cookie('Access-Token', '', {
+    httpOnly: true,
+    expires: new Date(0)
+  })
   res.status(200).json({
     message: 'user logout...'
   })
@@ -64,9 +82,7 @@ const logoutUser = asyncHandler(async (req, res) => {
  * @access Private
  */
 const getUserProfile = asyncHandler(async (req, res) => {
-  res.status(200).json({
-    message: 'user profile...'
-  })
+  res.status(200).json(req.user)
 })
 
 /**
@@ -75,9 +91,26 @@ const getUserProfile = asyncHandler(async (req, res) => {
  * @access Private
  */
 const updateUserProfile = asyncHandler(async (req, res) => {
-  res.status(200).json({
-    message: 'user profile updated...'
-  })
+  const user = await User.findById(req.user._id)  
+  if(user) {
+    try {
+      user.name = req.body.name || user.name
+      user.email = req.body.email || user.email
+      if(req.body.password) {
+        user.password = req.body.password
+      }
+      const updatedUser = await user.save()
+      res.status(200).json(updatedUser) 
+    } catch (error) {
+      res.status(400)
+      throw new Error('Invalid user data')
+    }
+
+  }else {
+    res.status(404)
+    throw new Error('User not found')
+  }
+ 
 })
 
 

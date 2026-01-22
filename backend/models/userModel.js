@@ -21,6 +21,13 @@ userSchema.pre('save', async function(next) {
     this.password = await bcrypt.hash(this.password, salt)
 })
 
+/**
+ * 自定义方法，用于比较密码
+ */
+userSchema.methods.matchPassword = async function(currentPassword) {
+    return await bcrypt.compare(currentPassword, this.password)
+}
+
 const User = mongoose.model('User', userSchema)
 
 export default User;
