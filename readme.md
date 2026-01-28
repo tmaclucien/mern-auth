@@ -1,3 +1,5 @@
+1. backend
+
 package.json
 
 - dotenv: load environment variables from .env file
@@ -5,6 +7,7 @@ package.json
 - bcryptjs: for hashing the password
 - jsonwebtoken: for authentication
 - express-async-handler: mongoose method which will be used within custom controller function return a promise, we can use try...catch in every controller. But when async-handler wrap the controller function, it will allow us to use custom error handler
+-concurrently: can run client and server with one command at the same time
 
 env
 
@@ -20,3 +23,12 @@ Middlewares
 JWT
 
 - jwt 有三部分组成，header + payload（存储的用户信息） + signature（本地签名，即 JWT_SECRECT）
+
+2. front end
+```
+npm create vite@latest frontend
+```
+
+3. links
+https://www.traversymedia.com/blog/mern-crash-course-part-1
+https://www.traversymedia.com/blog/mern-crash-course-part-2
